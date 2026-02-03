@@ -1,0 +1,21 @@
+Open termianl in folder to push/pull
+
+	PC -> GitHub
+	
+(If changes were made only on PC)
+git add .
+git commit -m "update files"
+git push
+
+(If changes were made on PC and GitHub, overwrite GitHub)
+git add .
+git commit -m "overwrite GitHub with local version"
+git push --force
+
+	GitHub -> PC
+
+(if folder exist in PC)
+git pull
+
+(if folder doesn't exist in PC)
+git clone git@github.com:LeoBosnardo/Doutorado.git
