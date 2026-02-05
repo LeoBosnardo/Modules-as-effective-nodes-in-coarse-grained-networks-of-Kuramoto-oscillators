@@ -6,6 +6,8 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <numeric>
 #include <algorithm>
 #include <boost/numeric/odeint.hpp>
@@ -161,28 +163,28 @@ struct OrderObserver {
 //=======================================================================================================================================================
 int main(int argc, char* argv[]){
 
-    int l_steps = std::stoi(argv[1]);
-    int run_number = std::stoi(argv[2]);
+    int run_number = stoi(argv[1]);
+    int l_steps = stoi(argv[2]);
+    int l_number = stoi(argv[3]);
 
     // lambda    
-    l = l_ini + run_number * (l_fin - l_ini) / l_steps;
+    l = l_ini + l_number * (l_fin - l_ini) / l_steps;
 
     // Cria pasta w*/p*/ e w*/p*/l*/
     ostringstream folder_stream_1;
     ostringstream folder_stream_2;
-    folder_stream_1 << "w" << std::fixed << setprecision(2) << w << "/p" << setprecision(2) << prob_con << "/";
-    folder_stream_2 << "w" << std::fixed << setprecision(2) << w << "/p" << setprecision(2) << prob_con << "/l" << setprecision(2) << l << "/";
+    folder_stream_1 << "w" << std::fixed << setprecision(2) << w << "/p" << setprecision(2) << prob_con << "/run_" << run_number << "/";
+    folder_stream_2 << "w" << std::fixed << setprecision(2) << w << "/p" << setprecision(2) << prob_con << "/run_" << run_number << "/l" << setprecision(2) << l << "/";
     string folder_1 = folder_stream_1.str();
     string folder_2 = folder_stream_2.str();
     filesystem::create_directories(folder_1);
     filesystem::create_directories(folder_2);
 
     // Cria arquivo rl.csv e rt.csv
-    if (run_number == 1) filesystem::remove(folder_1 + "rl.csv");
+    if (l_number == 1) filesystem::remove(folder_1 + "rl.csv");
     ofstream rl_file(folder_1 + "rl.csv", ios::app);
     ofstream rt_file(folder_2 + "rt.csv");
-    //rt_file << "l" << "," << "lin" << "," << "r1_tf" << "," << "r2_tf" << "," << "r_tf" << "," << "mean_r" << "," << "sigma_r" << "\n";
-
+    
     // aleatorios
     random_device rd;
     default_random_engine generator(rd());
@@ -252,8 +254,10 @@ int main(int argc, char* argv[]){
             0.01,
             observer);
 
-        for (int i = 0; i < r_t.size(); i++) {
-            rt_file << t_obs[i] << "," << r1_t[i] << "," << r2_t[i] << "," << r_t[i] << "\n";
+        if (run_number == 1) {
+            for (int i = 0; i < r_t.size(); i++) {
+                rt_file << t_obs[i] << "," << lin << "," << r1_t[i] << "," << r2_t[i] << "," << r_t[i] << "\n";
+            }
         }
 
         // menores valores de r1 e r2 no intervalo
@@ -296,8 +300,10 @@ int main(int argc, char* argv[]){
                     dt,
                     observer);
 
-    for (int i = 0; i < r_t.size(); i++) {
-        rt_file << t_obs[i] << "," << r1_t[i] << "," << r2_t[i] << "," << r_t[i] << "\n";
+    if (run_number == 1){
+        for (int i = 0; i < r_t.size(); i++) {
+            rt_file << t_obs[i] << "," << lin << "," << r1_t[i] << "," << r2_t[i] << "," << r_t[i] << "\n";
+        }
     }
 
     // numero de pontos que o integrador calculou
