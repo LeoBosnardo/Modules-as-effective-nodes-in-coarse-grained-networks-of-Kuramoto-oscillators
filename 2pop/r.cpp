@@ -220,7 +220,7 @@ int main(int argc, char* argv[]){
         omega[i] = norm_dist(generator);
         mean_freq += omega[i];
     }
-    mean_freq = mean_freq / nosc;
+    mean_freq = mean_freq / nosc1;
     for (int i = 0; i < nosc; i++) omega[i] -= mean_freq;
     for (int i = 0; i < nosc1; i++) omega[i] += w;
 
