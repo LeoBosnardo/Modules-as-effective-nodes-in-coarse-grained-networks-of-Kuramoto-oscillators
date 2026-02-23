@@ -333,16 +333,17 @@ subroutine matrix(prob_con)
 
     do i=1,nosc
         do j=i,nosc
-            call random_number(aleat)
-            if ( i == j ) then
+            if ( i==j ) then
                 A(i,j) = 0
+                cycle
             end if
-            if ( aleat.le.prob_con ) then
+            call random_number(aleat)
+            if (aleat <= prob_con) then
                 A(i,j) = 1
                 A(j,i) = 1
-                if ( j.le.nosc1 ) then
+                if (i <= nosc1 .and. j <= nosc1) then
                     C11 = C11 + 1.0
-                else if ( i.gt.nosc1 ) then
+                else if (i > nosc1 .and. j > nosc1) then
                     C22 = C22 + 1.0
                 else
                     C12 = C12 + 1.0
@@ -353,13 +354,11 @@ subroutine matrix(prob_con)
             end if
         end do
     end do
-
-    C12 = C12 / 2.0
     
-    k11 = C11/nosc1
+    k11 = 2.0*C11/nosc1
     k12 = C12/nosc1
     k21 = C12/nosc2
-    k22 = C22/nosc2
+    k22 = 2.0*C22/nosc2
   
     over_k11 = 1.0_rk / (k11)
     over_2k12 = 1.0_rk / (2*k12)
