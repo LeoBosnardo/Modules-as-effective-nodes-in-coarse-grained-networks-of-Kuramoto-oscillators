@@ -7,11 +7,14 @@ r_lambda <- read.csv("rl.csv", header = FALSE)
 data <- data.frame(r_lambda)
 colnames(data) <- c("l", "lin", "r", "mean_r", "sigma_r", "simbolo_r")
 
-r_lambda_3osc_u <- read_table("~/Documents/MestradoGitHub/3osc/r_lambda_upper.dat", col_names = TRUE)
-data3osc_u <- data.frame(r_lambda_3osc_u)
+#r_lambda_3osc_u <- read_table("~/Documents/MestradoGitHub/3osc/r_lambda_upper.dat", col_names = TRUE)
+#data3osc_u <- data.frame(r_lambda_3osc_u)
 
-r_lambda_3osc_l <- read_table("~/Documents/MestradoGitHub/3osc/r_lambda_lower.dat", col_names = TRUE)
-data3osc_l <- data.frame(r_lambda_3osc_l)
+#r_lambda_3osc_l <- read_table("~/Documents/MestradoGitHub/3osc/r_lambda_lower.dat", col_names = TRUE)
+#data3osc_l <- data.frame(r_lambda_3osc_l)
+
+r_lambda_3osc_ll <- read_table("~/Documents/MestradoGitHub/3osc/r_lambda_lowerlower.dat", col_names = TRUE)
+data3osc_l <- data.frame(r_lambda_3osc_ll)
 
 #arrumando os valores de sigma que sao nan
 data$sigma_r <- as.numeric(ifelse(data$sigma_r == "NaN", 0, data$sigma_r))
@@ -24,8 +27,8 @@ data$simbolo_r <- ifelse(data$sigma_r < 0.01, 0, 1)
 #plot
 ggplot(data = data) +
   scale_y_continuous(name = "\U1D45F", limits = c(0,1)) +
-  geom_ribbon(data = data3osc_u, aes(x = data3osc_u$l, ymin = data3osc_u$meanr - data3osc_u$sigmar, ymax = data3osc_u$meanr + data3osc_u$sigmar), fill = "#29AF7FFF", alpha = 0.2) +
-  geom_point(data = data3osc_u, aes(x = data3osc_u$l, y = data3osc_u$meanr), shape = 19, size = 1.6, color = "#29AF7FFF") +
+  #geom_ribbon(data = data3osc_u, aes(x = data3osc_u$l, ymin = data3osc_u$meanr - data3osc_u$sigmar, ymax = data3osc_u$meanr + data3osc_u$sigmar), fill = "#29AF7FFF", alpha = 0.2) +
+  #geom_point(data = data3osc_u, aes(x = data3osc_u$l, y = data3osc_u$meanr), shape = 19, size = 1.6, color = "#29AF7FFF") +
   geom_ribbon(data = data3osc_l, aes(x = data3osc_l$l, ymin = data3osc_l$meanr - data3osc_l$sigmar, ymax = data3osc_l$meanr + data3osc_l$sigmar), fill = "#29AF7FFF", alpha = 0.2) +
   geom_point(data = data3osc_l, aes(x = data3osc_l$l, y = data3osc_l$meanr), shape = 19, size = 1.6, color = "#29AF7FFF") +
   geom_ribbon(aes(x = data$l, ymin = data$mean_r - data$sigma_r, ymax = data$mean_r + data$sigma_r), fill = "firebrick", alpha = 0.2) +

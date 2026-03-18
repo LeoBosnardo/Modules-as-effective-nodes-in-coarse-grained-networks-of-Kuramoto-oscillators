@@ -4,15 +4,10 @@ import math
 import numpy as np
 from matplotlib.ticker import ScalarFormatter
 
-w = 1.5
-run = 1
+df = pd.read_csv('r_lambda.dat', header=None, delim_whitespace=True).values
 
-folder = f"w{w:.2f}/run_{run}/"
-
-df = pd.read_csv(folder + 'rl.csv', header=None)
-
-l = df.iloc[:, 0]
-lin = df.iloc[:, 1]
+l = df[:, 0]
+lin = df[:, 1]
 
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.grid(False)
@@ -26,7 +21,7 @@ ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
 
 plt.plot(l, lin, color = "black")
            
-output_image = folder + 'linl.png'
+output_image = 'linl.png'
 plt.savefig(output_image)
 
 plt.show()

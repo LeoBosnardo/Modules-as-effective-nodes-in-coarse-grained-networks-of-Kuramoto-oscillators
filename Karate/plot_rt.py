@@ -4,7 +4,7 @@ from matplotlib.ticker import ScalarFormatter
 
 w = 1.5
 run = 1
-l = 2.82
+l = 3.0
 
 folder = f"w{w:.2f}/run_{run}/l{l:.2f}/"
 

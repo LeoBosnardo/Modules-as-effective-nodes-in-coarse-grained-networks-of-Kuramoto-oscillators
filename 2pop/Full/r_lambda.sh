@@ -21,4 +21,5 @@ if [ $? -ne 0 ]; then
 fi
 rm r_lambda
 #
+mv r_lambda_vez1.dat $HOME/Documents/R/Artigo/w1.5/p01
 echo "Normal end of execution."

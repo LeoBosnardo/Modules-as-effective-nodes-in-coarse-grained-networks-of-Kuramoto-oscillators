@@ -4,12 +4,7 @@ import math
 import numpy as np
 from matplotlib.ticker import ScalarFormatter
 
-w = 1.5
-run = 1
-
-folder = f"w{w:.2f}/run_{run}/"
-
-df = pd.read_csv(folder + 'rl.csv', header=None)
+df = pd.read_csv('r_lambda.csv', header=None)
 
 l = df.iloc[:, 0]
 mean, std = df.iloc[:, 5], df.iloc[:, 6]
@@ -17,6 +12,13 @@ form = df.iloc[:, 7]
 
 triangle = (form == 0)
 dot = (form == 1)
+
+r1 = 0.9
+r2 = 0.9
+rho1 = 17/34
+rho2 = 17/34
+x = np.linspace(0,3,100)
+lower = np.sqrt(r1**2*rho1**2+r2**2*rho2**2+2*r1*r2*rho1*rho2*np.sqrt(1-(1.5/x)**2))
 
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.grid(False)
@@ -34,8 +36,10 @@ plt.fill_between(l, mean - std, mean + std, color='purple', alpha=0.2)
 plt.scatter(l[triangle], mean[triangle], marker='^', facecolors='none', edgecolors='purple')
 
 plt.scatter(l[dot], mean[dot], marker='o', color='purple')
-           
-output_image = folder + 'rl.png'
+
+plt.plot(x, lower, color="green")
+
+output_image = 'rl.png'
 plt.savefig(output_image)
 
 plt.show()

@@ -4,7 +4,7 @@ import math
 import numpy as np
 from matplotlib.ticker import ScalarFormatter
 
-df = pd.read_csv('rl.csv', header=None)
+df = pd.read_csv('r_lambda.dat', header=None)
 
 l = df.iloc[:, 0]
 mean, std = df.iloc[:, 3], df.iloc[:, 4]

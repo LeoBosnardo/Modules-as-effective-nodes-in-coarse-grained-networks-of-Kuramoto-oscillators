@@ -23,6 +23,7 @@ program main
     integer, parameter :: rk = kind ( 1.0D+00 )
     integer flag, i, j, l_steps, n_pts
     real ( kind = rk ) :: y(3), yp(3)
+    real ( kind = rk ) l_file(51), r1_file(51), r2_file(51), r3_file(51)
     real ( kind = rk ), allocatable :: r_t(:)
     real ( kind = rk ) t, t_1, t_2, &
                        relerr, abserr, aux, r, &
@@ -32,8 +33,14 @@ program main
                        rho1, rho2, rho3, &
                        r1, r2, r3, &
                        aux0, aux12, aux13, aux23
-      
-    open ( unit = 1, file = 'r_lambda.dat', status = 'unknown')
+    
+    open(unit=3,file='r_lambda_mean.dat',status='old')
+    do i=1,51
+        read(3,*) l_file(i), r1_file(i), r2_file(i), r3_file(i)
+    end do                   
+    close(3)
+
+    open ( unit = 1, file = 'r_lambda_lowerlower.dat', status = 'unknown')
     write (1, *) "l ",  "r ", "meanr ", "sigmar"
 
     !open ( unit = 2, file = 'rs_lin_tempo.dat', status = 'unknown')
@@ -51,13 +58,6 @@ program main
     rho1 = N1 / Nt
     rho2 = N2 / Nt
     rho3 = N3 / Nt
-    r1 = 1.0
-    r2 = 1.0
-    r3 = 1.0
-    aux0 = (rho1*r1)**2 + (rho2*r2)**2 + (rho3*r3)**2
-    aux12 = 2*rho1*rho2*r1*r2
-    aux13 = 2*rho1*rho3*r1*r3
-    aux23 = 2*rho2*rho3*r2*r3
     
     allocate(r_t(1000))
     n_pts = 1000
@@ -68,11 +68,20 @@ program main
     
     l_ini = 0.0
     l_fin = 10.0
-    l_steps = 100
+    l_steps = 50
 
     do j=0,l_steps
     
         l = l_ini + j*(l_fin - l_ini)/float(l_steps)
+
+        r1 = r1_file(j+1)
+        r2 = r2_file(j+1)
+        r3 = r3_file(j+1)
+
+        aux0 = (rho1*r1)**2 + (rho2*r2)**2 + (rho3*r3)**2
+        aux12 = 2*rho1*rho2*r1*r2
+        aux13 = 2*rho1*rho3*r1*r3
+        aux23 = 2*rho2*rho3*r2*r3
 
         do i=1,3
             call random_number(aux)

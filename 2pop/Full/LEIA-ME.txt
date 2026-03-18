@@ -1,0 +1,22 @@
+r.cpp/r_lambda.f90 é o modelo de kuramoto para 2 populações
+Toma como input de paramatros p (prob de conexão entre modulos) e w (frequencia médio do primeiro modulo)
+Gera arquivos de r, r1, r2 e lin como função e t para cada p, w e l
+Gera arquivo de r com desvio padrão, após sincronia intena dos modulos, como função de l.
+Roda simulações para cada l paralelamente com bash rodar_varias_vezes_parallelized.bash
+
+plot_rt.py faz o simples plot the r, r1 e r2 como função de t para determinado p, w e l
+
+reorder&sinc_rl.py reordena os as linhas de rl.csv em ordem crescente de l ja que a paralelização deixa misturado
+Tabmbém cria uma nova coluna binária indicando o menor valor de l cujo std de r é menor que threshold=0.01
+
+plot_rl.py faz um simples plot the r como função e l para determinado p e w
+
+-linMean.py gera o arquivo linl.csv contendo o valor de <l>, <lin> e stdev de l e lin para cada p e w
+A media e desvio padrão são calculadas sobre um conjunto independentes de simuçaões para o mesmo p e w
+-critical.py encontra o valor de transição de l, primeiro 1 em rl.csv, e anota l e seu respectivo lin no arquivo critical.csv
+A média e desvio padrão são calculadas sobre o mesmo conjunto independentes de simulações
+
+plot_linl.py faz um simples plot de lin como função de l
+Também plota o valor critico de l com respectivo lin do arquivo critical.csv
+
+transitions.py gera o arquivo transitions.csv contendo o valor critico de l com respectivo lin para cada p e w

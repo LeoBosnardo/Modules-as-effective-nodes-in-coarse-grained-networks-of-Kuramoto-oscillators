@@ -3,7 +3,7 @@ module r_lambda
     implicit none
     
     real(8), save :: omega(34)
-    integer(8), save :: mr_hi(17), officer(17)
+    integer, save :: mr_hi(17), officer(17)
     real(8), save :: k(4)
     real(8), save :: l, lin, &
                      pi, pi2, &
@@ -78,10 +78,15 @@ program main
         read(10,*) officer(i)
     end do                
     close(10)
-      
+
+    do i=1,17
+        mr_hi(i) = mr_hi(i) + 1
+        officer(i) = officer(i) + 1
+    end do
+
     open ( unit = 1, file = 'r_lambda.dat', status = 'unknown')
-    write (1, *) "l ", "lin ", "meanr1 ", "meanr2 ", "meanr ", "sigmar1 ", "sigmar2 ", "sigmar ", "r1 ", "r2 ", "r ", "psi1 ", &
-    "psi2 ", "psi ", "phi " 
+    !write (1, *) "l ", "lin ", "meanr1 ", "meanr2 ", "meanr ", "sigmar1 ", "sigmar2 ", "sigmar ", "r1 ", "r2 ", "r ", "psi1 ", &
+    !"psi2 ", "psi ", "phi " 
 
     !open ( unit = 2, file = 'rs_lin_tempo.dat', status = 'unknown')
     !write (2, *) "t ", "r1 ", "r2 ", "r ", "lin"
@@ -91,6 +96,11 @@ program main
     n_pts = 10000
     
     w = 1.5
+
+    omega = 0.0
+    do i=1,nosc1
+        omega(mr_hi(i)) = 1.5
+    end do
     
     l_ini = 0.0
     l_fin = 3.0
@@ -102,16 +112,12 @@ program main
     
         l = l_ini + j*(l_fin - l_ini)/float(l_steps)
 
-        lin = 0.0
+        !lin = 0.0
+        lin = 20.0
 
         do i=1,nosc
             call random_number(aux)
-            y(i) = aux*pi2
-        end do
-    
-        omega = 0.0
-        do i=1,nosc1
-            omega(mr_hi(i)) = 1.5
+            y(i) = aux*pi
         end do
     
         t = 0.0
@@ -122,7 +128,7 @@ program main
         r2_t_sd = 0.0
         r_t_sd = 0.0
         
-        do while ((minval(r1_t)<0.9).or.(minval(r2_t)<0.9))
+        !do while ((minval(r1_t)<0.9).or.(minval(r2_t)<0.9))
             
             do i=0,499
             
@@ -133,10 +139,10 @@ program main
                 
                 call rkf45( F, nosc, y, yp, t_1, t_2, relerr, abserr, flag)
                 
-                call para_ord(y,r1,r2,r,psi1,psi2,psi,phi)
+        !        call para_ord(y,r1,r2,r,psi1,psi2,psi,phi)
                 
-                r1_t(i+1) = r1
-                r2_t(i+1) = r2
+        !        r1_t(i+1) = r1
+        !        r2_t(i+1) = r2
                 
                 if (flag.eq.4) go to 1
                 
@@ -146,15 +152,15 @@ program main
             
             t = t_2
             
-            if (t_2>t_stop) go to 3
+        !    if (t_2>t_stop) go to 3
             
-            lin = lin + 0.1
+        !    lin = lin + 0.1
             
-        end do
+        !end do
         
-        lin = lin - 0.1
+        !lin = lin - 0.1
         
-        3 do i=1,10000
+        do i=1,10000
         
             flag = 1
     
@@ -304,6 +310,7 @@ subroutine para_ord(y, r1, r2, r, psi1, psi2, psi, phi)
                           zcplx(nosc), z1, z2, z
 
     imaginario = (0.0,1.0)
+    zcplx = (0.0, 0.0)
 
     do i = 1, size(mr_hi)
         z1cplx(i) = exp(imaginario * y(mr_hi(i)))

@@ -25,21 +25,24 @@ program main
 
     external F
     integer, parameter :: rk = kind ( 1.0D+00 )
-    integer flag, i, j, l_steps, n_pts
+    integer flag, i, j, u, lin_steps, l_steps, n_pts
     real ( kind = rk ) :: y(248), yp(248)
-    real ( kind = rk ), allocatable :: r_t(:)
+    real ( kind = rk ) :: r1_t(4000), r2_t(4000), r3_t(4000)
     real ( kind = rk ) t, t_1, t_2, eps, &
                        relerr, abserr, aux, &
                        w1, w2, w3, &
-                       l_ini, l_fin, &
+                       lin_ini, lin_fin, &
                        r1, r2, r3, &
-                       r, mean_r, soma_r, soma2_r, sigmar
+                       r, l_ini, l_fin, &
+                       mean_r1, mean_r2, mean_r3
     
     nmod = 3
     nosc1 = 130
     nosc2 = 77
     nosc3 = 41
     nosc = 248
+
+    n_pts = 4000
 
     open(unit=10, file="A.txt", status="old", action="read")                 
     do i = 1, nosc
@@ -77,19 +80,17 @@ program main
     end do                
     close(10)
 
-    open ( unit = 1, file = 'r_lambda.dat', status = 'unknown')
+    open ( unit = 1, file = 'r_lambda_mean.dat', status = 'unknown')
     !write (1, *) "l ", "lin ", "r ", "mean_r ", "sigma_r "
 
-    !open ( unit = 2, file = 'rs_lin_tempo.dat', status = 'unknown')
-    !write (2, *) "t ", "r "
+    open ( unit = 3, file = 'cond_init_m1.dat', status = 'unknown')
+    open ( unit = 4, file = 'cond_init_m2.dat', status = 'unknown')
+    open ( unit = 5, file = 'cond_init_m3.dat', status = 'unknown')
 
     pi = acos(-1.0)
     pi2 = 2.0*pi
     abserr = sqrt ( epsilon ( abserr ) )
     relerr = sqrt ( epsilon ( relerr ) )
-    
-    allocate(r_t(5000))
-    n_pts = 5000
     
     w1 = 0.0
     w2 = 1.0
@@ -105,55 +106,74 @@ program main
         omega(m3(i)+1) = w3
     end do
 
+    lin_ini = 1.0
+    lin_fin = 20.0
+    lin_steps = 19
+
     l_ini = 0.0
     l_fin = 10.0
     l_steps = 50
 
-    lin = 20.0
+    eps = pi
 
-    !eps = 4.0*pi/4.0
-    
-    do j=0,l_steps
-    
-        l = l_ini + j*(l_fin - l_ini)/float(l_steps)
+    do u=0,l_steps
+
+        l = l_ini + u*(l_fin - l_ini)/float(l_steps)
+
+        t = 0.0
 
         do i=1,nosc
             call random_number(aux)
-            y(i) = pi2*aux
+            y(i) = eps*aux
             !y(i) = 0.0
         end do
-    
-        t = 0.0
+
+        do j=0,lin_steps
+        
+            lin = lin_ini + j*(lin_fin - lin_ini)/float(lin_steps)
+                
+            do i=1,400
+
+                flag = 1
+        
+                1 t_1 = t + 0.1*(i-1)
+                t_2 = t + 0.1*i
             
-        do i=1,5000
+                call rkf45( F, nosc, y, yp, t_1, t_2, relerr, abserr, flag)
+                if (flag.eq.4) go to 1
+        
+            end do
+
+            t = t_2
+            
+        end do
+
+        do i=1,4000
 
             flag = 1
     
-            1 t_1 = t + 0.01*(i-1)
+            2 t_1 = t + 0.01*(i-1)
             t_2 = t + 0.01*i
         
             call rkf45( F, nosc, y, yp, t_1, t_2, relerr, abserr, flag)
-            if (flag.eq.4) go to 1
+            if (flag.eq.4) go to 2
             
-            call para_ord(y,r)
-            !call para_ord_full(y,r,r1,r2,r3)
+            call para_ord_full(y,r,r1,r2,r3)
             
-            r_t(i) = r
-            
-            !write (2, *) t_2, r, r1, r2, r3
-            !write (2, *) t_2, r
+            r1_t(i) = r1
+            r2_t(i) = r2
+            r3_t(i) = r3
     
         end do
+
+        mean_r1 = sum(r1_t)/n_pts
+        mean_r2 = sum(r2_t)/n_pts
+        mean_r3 = sum(r3_t)/n_pts
+
+        write (1, *) l, mean_r1, mean_r2, mean_r3
         
-        soma_r = sum(r_t)
-        mean_r = soma_r/n_pts
-        soma2_r = dot_product(r_t,r_t)
-        sigmar = sqrt((n_pts*soma2_r-soma_r*soma_r)/(n_pts*(n_pts-1)))
-        
-        write (1, *) l, lin, r, mean_r, sigmar
-        
-        print*, l, mean_r
-        
+        print*, l
+
     end do
 
     close (1)

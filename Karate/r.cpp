@@ -29,9 +29,9 @@ const double w = 1.5;
 const double l_ini = 0.0;
 const double l_fin = 3.0;
 
-const double t_intervalo = 200.0;
-const double t_intervaloMaior = 600.0;
-const double dt = 0.01;
+const double t_intervalo = 50.0;
+const double t_intervaloMaior = 100.0;
+const double dt = 0.001;
 
 double lin = 1.0;
 const double lin_incremento = 0.1;
@@ -228,7 +228,7 @@ int main(int argc, char* argv[]){
     OrderObserver observer(t_obs, r_t, r1_t, r2_t);
 
     // posição inicial
-    for (int i = 0; i < nosc; i++) y[i] = uniform(generator);
+    for (int i = 0; i < nosc; i++) y[i] = 0.0;//uniform(generator);
 
     // frequencia
     //double mean_freq = 0.0;

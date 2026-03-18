@@ -53,10 +53,18 @@ k = np.zeros((5, 5))
 for i in range(1, 6):
     Mi = modules_idx[i]
     for j in range(1, 6):
+        s = 0
         Mj = modules_idx[j]
         
-        edges_ij = A[np.ix_(Mi, Mj)].sum()
-        k[i-1, j-1] = edges_ij / len(Mi)
+        for a in Mi:
+            for b in Mj:
+                s += A[a,b]
+        kij = s / len(Mi)
+
+        #edges_ij = A[np.ix_(Mi, Mj)].sum()
+        #k[i-1, j-1] = edges_ij / len(Mi)
+
+        k[i-1, j-1] = kij
 
 # ---- save k as 9 values in one column ----
 np.savetxt("K.txt", k, fmt="%.6f")

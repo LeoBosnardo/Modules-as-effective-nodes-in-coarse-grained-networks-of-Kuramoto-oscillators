@@ -25,15 +25,14 @@ program main
 
     external F
     integer, parameter :: rk = kind ( 1.0D+00 )
-    integer flag, i, j, l_steps, n_pts
+    integer flag, i, j, lin_steps
     real ( kind = rk ) :: y(248), yp(248)
-    real ( kind = rk ), allocatable :: r_t(:)
     real ( kind = rk ) t, t_1, t_2, eps, &
                        relerr, abserr, aux, &
                        w1, w2, w3, &
-                       l_ini, l_fin, &
+                       lin_ini, lin_fin, &
                        r1, r2, r3, &
-                       r, mean_r, soma_r, soma2_r, sigmar
+                       r
     
     nmod = 3
     nosc1 = 130
@@ -77,19 +76,20 @@ program main
     end do                
     close(10)
 
-    open ( unit = 1, file = 'r_lambda.dat', status = 'unknown')
+    !open ( unit = 1, file = 'r_lambda.dat', status = 'unknown')
     !write (1, *) "l ", "lin ", "r ", "mean_r ", "sigma_r "
 
-    !open ( unit = 2, file = 'rs_lin_tempo.dat', status = 'unknown')
+    open ( unit = 2, file = 'rs_lin_tempo.dat', status = 'unknown')
     !write (2, *) "t ", "r "
+
+    open ( unit = 3, file = 'cond_init_m1.dat', status = 'unknown')
+    open ( unit = 4, file = 'cond_init_m2.dat', status = 'unknown')
+    open ( unit = 5, file = 'cond_init_m3.dat', status = 'unknown')
 
     pi = acos(-1.0)
     pi2 = 2.0*pi
     abserr = sqrt ( epsilon ( abserr ) )
     relerr = sqrt ( epsilon ( relerr ) )
-    
-    allocate(r_t(5000))
-    n_pts = 5000
     
     w1 = 0.0
     w2 = 1.0
@@ -105,54 +105,62 @@ program main
         omega(m3(i)+1) = w3
     end do
 
-    l_ini = 0.0
-    l_fin = 10.0
-    l_steps = 50
+    lin_ini = 1.0
+    lin_fin = 20.0
+    lin_steps = 19
 
-    lin = 20.0
+    l = 2.0
 
-    !eps = 4.0*pi/4.0
+    eps = pi
     
-    do j=0,l_steps
-    
-        l = l_ini + j*(l_fin - l_ini)/float(l_steps)
+    do i=1,nosc
+        call random_number(aux)
+        y(i) = eps*aux
+        !y(i) = 0.0
+    end do
 
-        do i=1,nosc
-            call random_number(aux)
-            y(i) = pi2*aux
-            !y(i) = 0.0
-        end do
+    do i=1,nosc1
+        write(3, *) y(m1(i)+1)
+    end do
+    do i=1,nosc2
+        write(4, *) y(m2(i)+1)
+    end do
+    do i=1,nosc3
+        write(5, *) y(m3(i)+1)
+    end do
+    close(3)
+    close(4)
+    close(5)
+
+    t = 0.0
+
+    do j=0,lin_steps
     
-        t = 0.0
+        lin = lin_ini + j*(lin_fin - lin_ini)/float(lin_steps)
             
-        do i=1,5000
+        do i=1,400
 
             flag = 1
     
-            1 t_1 = t + 0.01*(i-1)
-            t_2 = t + 0.01*i
+            1 t_1 = t + 0.1*(i-1)
+            t_2 = t + 0.1*i
         
             call rkf45( F, nosc, y, yp, t_1, t_2, relerr, abserr, flag)
             if (flag.eq.4) go to 1
             
-            call para_ord(y,r)
-            !call para_ord_full(y,r,r1,r2,r3)
+            !call para_ord(y,r)
+            call para_ord_full(y,r,r1,r2,r3)
             
-            r_t(i) = r
+            !r_t(i) = r
             
-            !write (2, *) t_2, r, r1, r2, r3
+            write (2, *) t_2, r, r1, r2, r3, lin
             !write (2, *) t_2, r
     
         end do
+
+        t = t_2
         
-        soma_r = sum(r_t)
-        mean_r = soma_r/n_pts
-        soma2_r = dot_product(r_t,r_t)
-        sigmar = sqrt((n_pts*soma2_r-soma_r*soma_r)/(n_pts*(n_pts-1)))
-        
-        write (1, *) l, lin, r, mean_r, sigmar
-        
-        print*, l, mean_r
+        print*, lin
         
     end do
 

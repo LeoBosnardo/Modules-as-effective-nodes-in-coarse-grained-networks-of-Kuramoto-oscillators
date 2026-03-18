@@ -3,19 +3,22 @@ library(scales)
 library(readr)
 library(dplyr)
 
-r_lambda <- read.csv("rl.csv", header = FALSE)
+r_lambda <- read.csv("r_lambda.dat", header = FALSE)
 data <- data.frame(r_lambda)
 colnames(data) <- c("l", "lin", "r", "mean_r", "sigma_r", "simbolo_r")
 
-r_lambda_osc_u <- read_table("~/Documents/MestradoGitHub/5osc/r_lambda_upper.dat", col_names = TRUE)
-dataosc_u <- data.frame(r_lambda_osc_u)
+#r_lambda_osc_u <- read_table("~/Documents/MestradoGitHub/5osc/r_lambda_upper.dat", col_names = TRUE)
+#dataosc_u <- data.frame(r_lambda_osc_u)
 
-r_lambda_osc_l <- read_table("~/Documents/MestradoGitHub/5osc/r_lambda_lower.dat", col_names = TRUE)
-dataosc_l <- data.frame(r_lambda_osc_l)
+#r_lambda_osc_l <- read_table("~/Documents/MestradoGitHub/5osc/r_lambda_lower.dat", col_names = TRUE)
+#dataosc_l <- data.frame(r_lambda_osc_l)
+
+r_lambda_osc_ll <- read_table("~/Documents/MestradoGitHub/5osc/r_lambda_lowerlower.dat", col_names = TRUE)
+dataosc_l <- data.frame(r_lambda_osc_ll)
 
 #arrumando os valores de sigma que sao nan
 data$sigma_r <- as.numeric(ifelse(data$sigma_r == "NaN", 0, data$sigma_r))
-dataosc_u$sigmar <- as.numeric(ifelse(dataosc_u$sigmar == "NaN", 0, dataosc_u$sigmar))
+#dataosc_u$sigmar <- as.numeric(ifelse(dataosc_u$sigmar == "NaN", 0, dataosc_u$sigmar))
 dataosc_l$sigmar <- as.numeric(ifelse(dataosc_l$sigmar == "NaN", 0, dataosc_l$sigmar))
 
 #coluna nova para decidir se é circulo ou triangulo
@@ -24,8 +27,8 @@ data$simbolo_r <- ifelse(data$sigma_r < 0.01, 0, 1)
 #plot
 ggplot(data = data) +
   scale_y_continuous(name = "\U1D45F", limits = c(0,1)) +
-  geom_ribbon(data = dataosc_u, aes(x = dataosc_u$l, ymin = dataosc_u$meanr - dataosc_u$sigmar, ymax = dataosc_u$meanr + dataosc_u$sigmar), fill = "#29AF7FFF", alpha = 0.2) +
-  geom_point(data = dataosc_u, aes(x = dataosc_u$l, y = dataosc_u$meanr), shape = 19, size = 1.6, color = "#29AF7FFF") +
+  #geom_ribbon(data = dataosc_u, aes(x = dataosc_u$l, ymin = dataosc_u$meanr - dataosc_u$sigmar, ymax = dataosc_u$meanr + dataosc_u$sigmar), fill = "#29AF7FFF", alpha = 0.2) +
+  #geom_point(data = dataosc_u, aes(x = dataosc_u$l, y = dataosc_u$meanr), shape = 19, size = 1.6, color = "#29AF7FFF") +
   geom_ribbon(data = dataosc_l, aes(x = dataosc_l$l, ymin = dataosc_l$meanr - dataosc_l$sigmar, ymax = dataosc_l$meanr + dataosc_l$sigmar), fill = "#29AF7FFF", alpha = 0.2) +
   geom_point(data = dataosc_l, aes(x = dataosc_l$l, y = dataosc_l$meanr), shape = 19, size = 1.6, color = "#29AF7FFF") +
   geom_ribbon(aes(x = data$l, ymin = data$mean_r - data$sigma_r, ymax = data$mean_r + data$sigma_r), fill = "firebrick", alpha = 0.2) +

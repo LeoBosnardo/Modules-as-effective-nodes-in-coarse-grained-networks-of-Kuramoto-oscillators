@@ -4,8 +4,8 @@ import numpy as np
 threshold = 0.01
 
 #file
-file = 'rl.csv'
-df = pd.read_csv(file, header=None)
+file = 'r_lambda.dat'
+df = pd.read_csv(file, header=None, delim_whitespace=True)
 
 # reorder
 df = df.sort_values(by=0, ascending=True).reset_index(drop=True)

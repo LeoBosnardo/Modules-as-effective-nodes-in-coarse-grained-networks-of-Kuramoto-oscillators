@@ -23,6 +23,8 @@ program main
     integer, parameter :: rk = kind ( 1.0D+00 )
     integer flag, i, j, l_steps, n_pts
     real ( kind = rk ) :: y(10), yp(10)
+    real ( kind = rk ) l_f(51), r1_f(51), r2_f(51), r3_f(51), r4_f(51), r5_f(51), &
+                       r6_f(51), r7_f(51), r8_f(51), r9_f(51), r10_f(51)
     real ( kind = rk ), allocatable :: r_t(:)
     real ( kind = rk ) t, t_1, t_2, &
                        relerr, abserr, aux, r, &
@@ -40,12 +42,15 @@ program main
                        p78, p79, p710, &
                        p89, p810, &
                        p910
-      
-    open ( unit = 1, file = 'r_lambda.dat', status = 'unknown')
-    write (1, *) "l ",  "r ", "meanr ", "sigmar"
+    
+    open(unit=3,file='r_lambda_mean.dat',status='old')
+    do i=1,51
+        read(3,*) l_f(i), r1_f(i), r2_f(i), r3_f(i), r4_f(i), r5_f(i), r6_f(i), r7_f(i), r8_f(i), r9_f(i), r10_f(i)
+    end do                   
+    close(3)
 
-    !open ( unit = 2, file = 'rs_lin_tempo.dat', status = 'unknown')
-    !write (2, *) "t ", "r"
+    open ( unit = 1, file = 'r_lambda_lowerlower.dat', status = 'unknown')
+    write (1, *) "l ",  "r ", "meanr ", "sigmar"
 
     pi = acos(-1.0)
     pi2 = 2.0*pi
@@ -73,63 +78,6 @@ program main
     rho8 = N8 / Nt
     rho9 = N9 / Nt
     rho10 = N10 / Nt
-    r1 = 0.9
-    r2 = 0.9
-    r3 = 0.9
-    r4 = 0.9
-    r5 = 0.9
-    r6 = 0.9
-    r7 = 0.9
-    r8 = 0.9
-    r9 = 0.9
-    r10 = 0.9
-    aux0 = (rho1*r1)**2 + (rho2*r2)**2 + (rho3*r3)**2 + (rho4*r4)**2 + (rho5*r5)**2 +&
-           (rho6*r6)**2 + (rho7*r7)**2 + (rho8*r8)**2 + (rho9*r9)**2 + (rho10*r10)**2
-    p12 = 2*rho1*rho2*r1*r2
-    p13 = 2*rho1*rho3*r1*r3
-    p14 = 2*rho1*rho4*r1*r4
-    p15 = 2*rho1*rho5*r1*r5
-    p16 = 2*rho1*rho6*r1*r6
-    p17 = 2*rho1*rho7*r1*r7
-    p18 = 2*rho1*rho8*r1*r8
-    p19 = 2*rho1*rho9*r1*r9
-    p110 = 2*rho1*rho10*r1*r10
-    p23 = 2*rho2*rho3*r2*r3
-    p24 = 2*rho2*rho4*r2*r4
-    p25 = 2*rho2*rho5*r2*r5
-    p26 = 2*rho2*rho6*r2*r6
-    p27 = 2*rho2*rho7*r2*r7
-    p28 = 2*rho2*rho8*r2*r8
-    p29 = 2*rho2*rho9*r2*r9
-    p210 = 2*rho2*rho10*r2*r10
-    p34 = 2*rho3*rho4*r3*r4
-    p35 = 2*rho3*rho5*r3*r5
-    p36 = 2*rho3*rho6*r3*r6
-    p37 = 2*rho3*rho7*r3*r7
-    p38 = 2*rho3*rho8*r3*r8
-    p39 = 2*rho3*rho9*r3*r9
-    p310 = 2*rho3*rho10*r3*r10
-    p45 = 2*rho4*rho5*r4*r5
-    p46 = 2*rho4*rho6*r4*r6
-    p47 = 2*rho4*rho7*r4*r7
-    p48 = 2*rho4*rho8*r4*r8
-    p49 = 2*rho4*rho9*r4*r9
-    p410 = 2*rho4*rho10*r4*r10
-    p56 = 2*rho5*rho6*r5*r6
-    p57 = 2*rho5*rho7*r5*r7
-    p58 = 2*rho5*rho8*r5*r8
-    p59 = 2*rho5*rho9*r5*r9
-    p510 = 2*rho5*rho10*r5*r10
-    p67 = 2*rho6*rho7*r6*r7
-    p68 = 2*rho6*rho8*r6*r8
-    p69 = 2*rho6*rho9*r6*r9
-    p610 = 2*rho6*rho10*r6*r10
-    p78 = 2*rho7*rho8*r7*r8
-    p79 = 2*rho7*rho9*r7*r9
-    p710 = 2*rho7*rho10*r7*r10
-    p89 = 2*rho8*rho9*r8*r9
-    p810 = 2*rho8*rho10*r8*r10
-    p910 = 2*rho9*rho10*r9*r10
     
     allocate(r_t(1000))
     n_pts = 1000
@@ -147,11 +95,70 @@ program main
     
     l_ini = 0.0
     l_fin = 10.0
-    l_steps = 100
+    l_steps = 50
 
     do j=0,l_steps
     
         l = l_ini + j*(l_fin - l_ini)/float(l_steps)
+
+        r1 = r1_f(j+1)
+        r2 = r2_f(j+1)
+        r3 = r3_f(j+1)
+        r4 = r4_f(j+1)
+        r5 = r5_f(j+1)
+        r6 = r6_f(j+1)
+        r7 = r7_f(j+1)
+        r8 = r8_f(j+1)
+        r9 = r9_f(j+1)
+        r10 = r10_f(j+1)
+
+        aux0 = (rho1*r1)**2 + (rho2*r2)**2 + (rho3*r3)**2 + (rho4*r4)**2 + (rho5*r5)**2 +&
+            (rho6*r6)**2 + (rho7*r7)**2 + (rho8*r8)**2 + (rho9*r9)**2 + (rho10*r10)**2
+        p12 = 2*rho1*rho2*r1*r2
+        p13 = 2*rho1*rho3*r1*r3
+        p14 = 2*rho1*rho4*r1*r4
+        p15 = 2*rho1*rho5*r1*r5
+        p16 = 2*rho1*rho6*r1*r6
+        p17 = 2*rho1*rho7*r1*r7
+        p18 = 2*rho1*rho8*r1*r8
+        p19 = 2*rho1*rho9*r1*r9
+        p110 = 2*rho1*rho10*r1*r10
+        p23 = 2*rho2*rho3*r2*r3
+        p24 = 2*rho2*rho4*r2*r4
+        p25 = 2*rho2*rho5*r2*r5
+        p26 = 2*rho2*rho6*r2*r6
+        p27 = 2*rho2*rho7*r2*r7
+        p28 = 2*rho2*rho8*r2*r8
+        p29 = 2*rho2*rho9*r2*r9
+        p210 = 2*rho2*rho10*r2*r10
+        p34 = 2*rho3*rho4*r3*r4
+        p35 = 2*rho3*rho5*r3*r5
+        p36 = 2*rho3*rho6*r3*r6
+        p37 = 2*rho3*rho7*r3*r7
+        p38 = 2*rho3*rho8*r3*r8
+        p39 = 2*rho3*rho9*r3*r9
+        p310 = 2*rho3*rho10*r3*r10
+        p45 = 2*rho4*rho5*r4*r5
+        p46 = 2*rho4*rho6*r4*r6
+        p47 = 2*rho4*rho7*r4*r7
+        p48 = 2*rho4*rho8*r4*r8
+        p49 = 2*rho4*rho9*r4*r9
+        p410 = 2*rho4*rho10*r4*r10
+        p56 = 2*rho5*rho6*r5*r6
+        p57 = 2*rho5*rho7*r5*r7
+        p58 = 2*rho5*rho8*r5*r8
+        p59 = 2*rho5*rho9*r5*r9
+        p510 = 2*rho5*rho10*r5*r10
+        p67 = 2*rho6*rho7*r6*r7
+        p68 = 2*rho6*rho8*r6*r8
+        p69 = 2*rho6*rho9*r6*r9
+        p610 = 2*rho6*rho10*r6*r10
+        p78 = 2*rho7*rho8*r7*r8
+        p79 = 2*rho7*rho9*r7*r9
+        p710 = 2*rho7*rho10*r7*r10
+        p89 = 2*rho8*rho9*r8*r9
+        p810 = 2*rho8*rho10*r8*r10
+        p910 = 2*rho9*rho10*r9*r10
 
         do i=1,10
             call random_number(aux)

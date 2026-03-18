@@ -35,6 +35,15 @@ np.savetxt("m2.txt", m2, fmt="%d")
 np.savetxt("m3.txt", m3, fmt="%d")
 np.savetxt("module.txt", modules, fmt="%d")
 
+# ---- adjacency matrices of each module ----
+A11 = A[np.ix_(m1, m1)]
+A22 = A[np.ix_(m2, m2)]
+A33 = A[np.ix_(m3, m3)]
+
+np.savetxt("A11.txt", A11, fmt="%d")
+np.savetxt("A22.txt", A22, fmt="%d")
+np.savetxt("A33.txt", A33, fmt="%d")
+
 # ---- compute k_ij ----
 modules_idx = {
     1: np.where(modules == 1)[0],
@@ -47,10 +56,17 @@ k = np.zeros((3, 3))
 for i in range(1, 4):
     Mi = modules_idx[i]
     for j in range(1, 4):
+        s = 0
         Mj = modules_idx[j]
+
+        for a in Mi:
+            for b in Mj:
+                s += A[a,b]
+        kij = s / len(Mi)
         
-        edges_ij = A[np.ix_(Mi, Mj)].sum()
-        k[i-1, j-1] = edges_ij / len(Mi)
+        #edges_ij = A[np.ix_(Mi, Mj)].sum()
+        #k[i-1, j-1] = edges_ij / len(Mi)
+        k[i-1, j-1] = kij
 
 # ---- save k as 9 values in one column ----
 np.savetxt("K.txt", k, fmt="%.6f")

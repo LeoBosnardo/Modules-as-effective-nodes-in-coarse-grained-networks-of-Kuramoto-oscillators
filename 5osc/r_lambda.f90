@@ -23,6 +23,7 @@ program main
     integer, parameter :: rk = kind ( 1.0D+00 )
     integer flag, i, j, l_steps, n_pts
     real ( kind = rk ) :: y(5), yp(5)
+    real ( kind = rk ) l_f(51), r1_f(51), r2_f(51), r3_f(51), r4_f(51), r5_f(51)
     real ( kind = rk ), allocatable :: r_t(:)
     real ( kind = rk ) t, t_1, t_2, &
                        relerr, abserr, aux, r, &
@@ -32,12 +33,15 @@ program main
                        rho1, rho2, rho3, rho4, rho5, &
                        r1, r2, r3, r4, r5, &
                        aux0, p12, p13, p14, p15, p23, p24, p25, p34, p35, p45
-      
-    open ( unit = 1, file = 'r_lambda.dat', status = 'unknown')
-    write (1, *) "l ",  "r ", "meanr ", "sigmar"
+    
+    open(unit=3,file='r_lambda_mean.dat',status='old')
+    do i=1,51
+        read(3,*) l_f(i), r1_f(i), r2_f(i), r3_f(i), r4_f(i), r5_f(i)
+    end do                   
+    close(3)
 
-    !open ( unit = 2, file = 'rs_lin_tempo.dat', status = 'unknown')
-    !write (2, *) "t ", "r"
+    open ( unit = 1, file = 'r_lambda_lowerlower.dat', status = 'unknown')
+    write (1, *) "l ",  "r ", "meanr ", "sigmar"
 
     pi = acos(-1.0)
     pi2 = 2.0*pi
@@ -55,22 +59,6 @@ program main
     rho3 = N3 / Nt
     rho4 = N4 / Nt
     rho5 = N5 / Nt
-    r1 = 0.9
-    r2 = 0.9
-    r3 = 0.9
-    r4 = 0.9
-    r5 = 0.9
-    aux0 = (rho1*r1)**2 + (rho2*r2)**2 + (rho3*r3)**2 + (rho4*r4)**2 + (rho5*r5)**2
-    p12 = 2*rho1*rho2*r1*r2
-    p13 = 2*rho1*rho3*r1*r3
-    p14 = 2*rho1*rho4*r1*r4
-    p15 = 2*rho1*rho5*r1*r5
-    p23 = 2*rho2*rho3*r2*r3
-    p24 = 2*rho2*rho4*r2*r4
-    p25 = 2*rho2*rho5*r2*r5
-    p34 = 2*rho3*rho4*r3*r4
-    p35 = 2*rho3*rho5*r3*r5
-    p45 = 2*rho4*rho5*r4*r5
     
     allocate(r_t(1000))
     n_pts = 1000
@@ -83,11 +71,29 @@ program main
     
     l_ini = 0.0
     l_fin = 10.0
-    l_steps = 100
+    l_steps = 50
 
     do j=0,l_steps
     
         l = l_ini + j*(l_fin - l_ini)/float(l_steps)
+
+        r1 = r1_f(j+1)
+        r2 = r2_f(j+1)
+        r3 = r3_f(j+1)
+        r4 = r4_f(j+1)
+        r5 = r5_f(j+1)
+
+        aux0 = (rho1*r1)**2 + (rho2*r2)**2 + (rho3*r3)**2 + (rho4*r4)**2 + (rho5*r5)**2
+        p12 = 2*rho1*rho2*r1*r2
+        p13 = 2*rho1*rho3*r1*r3
+        p14 = 2*rho1*rho4*r1*r4
+        p15 = 2*rho1*rho5*r1*r5
+        p23 = 2*rho2*rho3*r2*r3
+        p24 = 2*rho2*rho4*r2*r4
+        p25 = 2*rho2*rho5*r2*r5
+        p34 = 2*rho3*rho4*r3*r4
+        p35 = 2*rho3*rho5*r3*r5
+        p45 = 2*rho4*rho5*r4*r5
 
         do i=1,5
             call random_number(aux)
